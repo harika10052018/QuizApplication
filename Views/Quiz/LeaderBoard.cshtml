@@ -1,0 +1,28 @@
+﻿@model IEnumerable<LeaderboardEntryViewModel>
+
+<h2>Leaderboard</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>User Name</th>
+            <th>Quiz</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int rank = 1;
+            foreach (var entry in Model)
+            {
+                <tr>
+                    <td>@rank</td>
+                    <td>@entry.UserName</td>
+                    <td>@entry.QuizTitle</td>
+                    <td>@entry.Score</td>
+                </tr>
+                rank++;
+            }
+        }
+    </tbody>
+</table>

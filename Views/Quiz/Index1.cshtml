@@ -1,0 +1,10 @@
+﻿@model IEnumerable<QuizApplication.Models.Quiz>
+
+<ul>
+    @foreach (var quiz in Model)
+    {
+        <li>
+            <a href="@Url.Action("Leaderboard", "Quiz", new { quizId = @quiz.Id })">View @quiz.Topic Leaderboard</a>
+        </li>
+    }
+</ul>
