@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using QuizApplication.Data;
 using QuizApplication.Models;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
@@ -17,36 +15,6 @@ public class QuizController : Controller
         _context = context;
     }
 
-    public IActionResult Leaderboard(int quizId)
-    {
-        var leaderboard = _context.UserQuizzes
-                .Where(uq => uq.QuizId == quizId && uq.IsCompleted)
-                .GroupBy(uq => uq.UserId) // Group by UserId to find the best score for each user
-                .Select(group => new
-                {
-                    UserId = group.Key,
-                    BestScore = group.Max(uq => uq.Score), // Get the best score for each user
-                    QuizId = group.FirstOrDefault().QuizId // Get the QuizId for the associated quiz
-                })
-                .Join(_context.Users, // Join with Users table to get User details
-                    result => result.UserId,
-                    user => user.Id,
-                    (result, user) => new { result, user })
-                .Join(_context.Quizzes, // Join with Quizzes table to get Quiz details
-                    result => result.result.QuizId,
-                    quiz => quiz.Id,
-                    (result, quiz) => new LeaderboardEntryViewModel
-                    {
-                        UserName = result.user.UserName ?? "Unknown",
-                        QuizTitle = quiz.Title ?? "No Title",
-                        Score = result.result.BestScore
-                    })
-                .OrderByDescending(entry => entry.Score) // Order the leaderboard by score
-                .ToList();
-        return View(leaderboard);
-    }
-
-    // Action to display a list of quizzes
     public async Task<IActionResult> Index()
     {
         var quizzes = await _context.Quizzes.ToListAsync();
@@ -59,7 +27,6 @@ public class QuizController : Controller
         return View(quizzes);
     }
 
-    // Action to display quiz questions
     public async Task<IActionResult> StartQuiz(int id)
     {
         var quiz = await _context.Quizzes
@@ -75,7 +42,6 @@ public class QuizController : Controller
         return View(quiz);
     }
 
-    // Action to submit quiz answers
     [HttpPost]
     public async Task<IActionResult> SubmitQuiz(int quizId, Dictionary<int, int> answers)
     {
@@ -98,21 +64,21 @@ public class QuizController : Controller
             {
                 score++;
             }
+            else
+            {
+
+            }
         }
 
-        // Get the correct UserId
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        // Ensure the UserId is valid
         if (string.IsNullOrEmpty(userId))
         {
-            return Unauthorized(); // Handle the case where user is not authenticated
+            return Unauthorized();
         }
 
-        // Save score to UserQuiz table
         var userQuiz = new UserQuiz
         {
-            UserId = userId, // Assuming you store user info in Identity
+            UserId = userId,
             QuizId = quizId,
             IsCompleted = true,
             Score = score
@@ -121,6 +87,35 @@ public class QuizController : Controller
         await _context.SaveChangesAsync();
 
         ViewBag.Score = score;
-        return View("Result", score); // Assuming you have a Result view to display the score
+        return View("Result", score);
+    }
+
+    public IActionResult Leaderboard(int quizId)
+    {
+        var leaderboard = _context.UserQuizzes
+                .Where(uq => uq.QuizId == quizId && uq.IsCompleted)
+                .GroupBy(uq => uq.UserId)
+                .Select(group => new
+                {
+                    UserId = group.Key,
+                    BestScore = group.Max(uq => uq.Score),
+                    QuizId = group.FirstOrDefault().QuizId
+                })
+                .Join(_context.Users,
+                    result => result.UserId,
+                    user => user.Id,
+                    (result, user) => new { result, user })
+                .Join(_context.Quizzes,
+                    result => result.result.QuizId,
+                    quiz => quiz.Id,
+                    (result, quiz) => new LeaderboardEntryViewModel
+                    {
+                        UserName = result.user.UserName ?? "Unknown",
+                        QuizTitle = quiz.Title ?? "No Title",
+                        Score = result.result.BestScore
+                    })
+                .OrderByDescending(entry => entry.Score)
+                .ToList();
+        return View(leaderboard);
     }
 }

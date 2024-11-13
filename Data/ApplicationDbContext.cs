@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using QuizApplication.Models;
-using static QuizApplication.Models.Quiz;
 
 namespace QuizApplication.Data
 {

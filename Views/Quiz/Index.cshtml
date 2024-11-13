@@ -1,13 +1,15 @@
 ﻿@model IEnumerable<QuizApplication.Models.Quiz>
 
-<h2>Available Quiz Topics</h2>
+<h2 style="list-style-type: none; padding: 0; text-align: center;">Available Quiz Topics</h2>
 
-<ul>
+<ul style="list-style-type: none; padding: 0; text-align: center;">
     @foreach (var quiz in Model)
     {
-        <li>
-            <a asp-action="StartQuiz" asp-route-id="@quiz.Id">@quiz.Topic</a>
+        <li style="margin-bottom: 10px;">
+            <a asp-action="StartQuiz" asp-route-id="@quiz.Id"
+               style="text-decoration: none; color: #007BFF; font-size: 18px;">
+                @quiz.Topic
+            </a>
         </li>
     }
 </ul>
-

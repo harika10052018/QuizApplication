@@ -14,21 +14,6 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    ////options.LoginPath = "/Identity/Account/Login";
-    ////options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-    ////options.ReturnUrlParameter = "/Quiz/Index"; // Redirect to quizzes page after login
-    options.LoginPath = "/Identity/Account/Login";  // Redirect to this URL for login
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // Optional: add access denied page
-    options.SlidingExpiration = true;
-    options.Events.OnRedirectToLogin = context =>
-    {
-        context.Response.Redirect("/Quiz"); // Redirect to the quiz list after login
-        return System.Threading.Tasks.Task.CompletedTask;
-    };
-});
-
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
